@@ -1,0 +1,96 @@
+.set-form {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.set-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.set-number {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.btn-delete-set {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  line-height: 1;
+}
+
+.btn-delete-set:hover {
+  color: #e74c3c;
+}
+
+.set-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.set-fields .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.set-fields .field label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.set-fields .field input {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.set-fields .field input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.rpe-field {
+  grid-column: 1 / -1;
+}
+
+.rpe-selector {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.rpe-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rpe-btn:hover {
+  border-color: var(--accent-color);
+}
+
+.rpe-btn.active {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
