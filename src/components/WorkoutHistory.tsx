@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { WorkoutEntry } from '../types';
-import { getWorkouts, deleteWorkout } from '../services/storage';
+import { getWorkouts, deleteWorkout, downloadWorkoutsAsJSON, downloadWorkoutsAsCSV } from '../services/storage';
 import './WorkoutHistory.css';
 
 interface Props {
@@ -10,6 +10,7 @@ interface Props {
 export default function WorkoutHistory({ refreshKey }: Props) {
   const [workouts, setWorkouts] = useState<WorkoutEntry[]>(() => getWorkouts());
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // 当 refreshKey 变化时刷新数据
   useState(() => {
@@ -35,8 +36,10 @@ export default function WorkoutHistory({ refreshKey }: Props) {
 
   const handleDelete = (id: string) => {
     if (confirm('确定要删除这条训练记录吗？')) {
-      deleteWorkout(id);
-      handleRefresh();
+      if (confirm('再次确认：删除后无法恢复，确定删除吗？')) {
+        deleteWorkout(id);
+        handleRefresh();
+      }
     }
   };
 
@@ -63,9 +66,35 @@ export default function WorkoutHistory({ refreshKey }: Props) {
     );
   }
 
+  const handleExportJSON = () => {
+    downloadWorkoutsAsJSON();
+    setShowExportMenu(false);
+  };
+
+  const handleExportCSV = () => {
+    downloadWorkoutsAsCSV();
+    setShowExportMenu(false);
+  };
+
   return (
     <div className="workout-history">
-      <h2>训练历史</h2>
+      <div className="history-header-bar">
+        <h2>训练历史</h2>
+        <div className="export-container">
+          <button
+            className="btn-export"
+            onClick={() => setShowExportMenu(!showExportMenu)}
+          >
+            导出数据 ▼
+          </button>
+          {showExportMenu && (
+            <div className="export-menu">
+              <button onClick={handleExportJSON}>导出为 JSON</button>
+              <button onClick={handleExportCSV}>导出为 CSV</button>
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="history-list">
         {workouts.map((workout) => (

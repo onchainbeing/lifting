@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import WorkoutForm from './components/WorkoutForm';
 import WorkoutHistory from './components/WorkoutHistory';
+import Settings from './components/Settings';
 import './App.css';
 
-type Tab = 'record' | 'history';
+type Tab = 'record' | 'history' | 'settings';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('record');
@@ -17,7 +18,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>力量训练日记</h1>
+        <h1>帆帆的力量训练日记</h1>
       </header>
 
       <nav className="tab-nav">
@@ -33,14 +34,18 @@ function App() {
         >
           训练历史
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          设置
+        </button>
       </nav>
 
       <main className="app-main">
-        {activeTab === 'record' ? (
-          <WorkoutForm onSaved={handleSaved} />
-        ) : (
-          <WorkoutHistory refreshKey={refreshKey} />
-        )}
+        {activeTab === 'record' && <WorkoutForm onSaved={handleSaved} />}
+        {activeTab === 'history' && <WorkoutHistory refreshKey={refreshKey} />}
+        {activeTab === 'settings' && <Settings />}
       </main>
     </div>
   );

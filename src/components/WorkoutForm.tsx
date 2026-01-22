@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { WorkoutEntry, ExerciseRecord, SetRecord } from '../types';
 import { generateId, saveWorkout } from '../services/storage';
+import { notifyWorkoutSaved } from '../services/notification';
 import ExerciseSelector from './ExerciseSelector';
 import SetForm from './SetForm';
 import PhotoUploader from './PhotoUploader';
@@ -40,6 +41,22 @@ export default function WorkoutForm({ onSaved }: Props) {
           ? { ...ex, sets: [...ex.sets, createEmptySet()] }
           : ex
       )
+    );
+  };
+
+  const handleCopyLastSet = (exerciseId: string) => {
+    setExercises(
+      exercises.map((ex) => {
+        if (ex.id !== exerciseId || ex.sets.length === 0) return ex;
+        const lastSet = ex.sets[ex.sets.length - 1];
+        const copiedSet: SetRecord = {
+          id: generateId(),
+          weight: lastSet.weight,
+          reps: lastSet.reps,
+          rpe: lastSet.rpe,
+        };
+        return { ...ex, sets: [...ex.sets, copiedSet] };
+      })
     );
   };
 
@@ -84,6 +101,9 @@ export default function WorkoutForm({ onSaved }: Props) {
     };
 
     saveWorkout(workout);
+
+    // 发送 Bark 推送通知（异步，不阻塞）
+    notifyWorkoutSaved(workout);
 
     // 重置表单
     setExercises([]);
@@ -131,12 +151,21 @@ export default function WorkoutForm({ onSaved }: Props) {
               ))}
             </div>
 
-            <button
-              className="btn-add-set"
-              onClick={() => handleAddSet(exercise.id)}
-            >
-              + 添加一组
-            </button>
+            <div className="set-actions">
+              <button
+                className="btn-add-set"
+                onClick={() => handleAddSet(exercise.id)}
+              >
+                + 添加一组
+              </button>
+              <button
+                className="btn-copy-set"
+                onClick={() => handleCopyLastSet(exercise.id)}
+                disabled={exercise.sets.length === 0}
+              >
+                复制上一组
+              </button>
+            </div>
           </div>
         ))}
       </div>

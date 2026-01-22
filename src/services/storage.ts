@@ -2,6 +2,7 @@ import type { WorkoutEntry, SavedExercises } from '../types';
 
 const WORKOUTS_KEY = 'lifting_workouts';
 const EXERCISES_KEY = 'lifting_exercises';
+const BARK_URL_KEY = 'lifting_bark_url';
 
 // 获取所有训练记录
 export function getWorkouts(): WorkoutEntry[] {
@@ -63,4 +64,66 @@ export function removeExercise(exerciseName: string): void {
 // 生成唯一ID
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+// 导出训练记录为 JSON 字符串
+export function exportWorkoutsAsJSON(): string {
+  const workouts = getWorkouts();
+  return JSON.stringify(workouts, null, 2);
+}
+
+// 导出训练记录为 CSV 字符串
+export function exportWorkoutsAsCSV(): string {
+  const workouts = getWorkouts();
+  const rows: string[] = ['日期,动作,组数,重量(kg),次数,RPE'];
+
+  for (const workout of workouts) {
+    for (const exercise of workout.exercises) {
+      for (let i = 0; i < exercise.sets.length; i++) {
+        const set = exercise.sets[i];
+        rows.push(
+          `${workout.date},${exercise.exerciseName},${i + 1},${set.weight},${set.reps},${set.rpe}`
+        );
+      }
+    }
+  }
+
+  return rows.join('\n');
+}
+
+// 触发浏览器下载文件
+function downloadFile(content: string, filename: string, mimeType: string): void {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// 导出并下载 JSON 文件
+export function downloadWorkoutsAsJSON(): void {
+  const content = exportWorkoutsAsJSON();
+  const date = new Date().toISOString().split('T')[0];
+  downloadFile(content, `lifting-backup-${date}.json`, 'application/json');
+}
+
+// 导出并下载 CSV 文件
+export function downloadWorkoutsAsCSV(): void {
+  const content = exportWorkoutsAsCSV();
+  const date = new Date().toISOString().split('T')[0];
+  downloadFile(content, `lifting-export-${date}.csv`, 'text/csv');
+}
+
+// 获取 Bark URL
+export function getBarkUrl(): string {
+  return localStorage.getItem(BARK_URL_KEY) || '';
+}
+
+// 设置 Bark URL
+export function setBarkUrl(url: string): void {
+  localStorage.setItem(BARK_URL_KEY, url);
 }
